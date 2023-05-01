@@ -36,11 +36,14 @@ public class ClientDAO {
         return query.getResultList();
     }
      
-     public Client chercherParEmploye(Employe monEmploye) {
-        String s = "select c.client from Consultation c where c.employe = :unEmploye and c.etat = :etat";
+    public List<Client> chercherParEmploye(Employe monEmploye) {
+        String s = "select c from Client c JOIN c.historique co where co.employe = :unEmploye and (co.etat=:etat or co.etat=:etat2)";
         TypedQuery <Client> query = JpaUtil.obtenirContextePersistance().createQuery(s,Client.class);
         query.setParameter("unEmploye", monEmploye);
         query.setParameter("etat", "Demandée");
-        return query.getResultList().get(0);
+        query.setParameter("etat2", "Prête");
+        
+        
+        return query.getResultList();
     }
 }

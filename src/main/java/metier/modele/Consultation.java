@@ -80,10 +80,10 @@ public class Consultation {
     }
     
     public String getHeureFin() {
-        return this.heureDebut;
+        return this.heureFin;
     }
     
-    public void getHeureFin(String heureFin){
+    public void setHeureFin(String heureFin){
         this.heureFin=heureFin;
     }
     

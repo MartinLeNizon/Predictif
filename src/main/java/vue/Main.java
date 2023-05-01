@@ -120,7 +120,7 @@ public class Main {
         donc de l'aide. Il termine ensuite la consultation, laisse un
         commentaire, consulte les activités de l'agence puis se déconnecte*/
         
-        testerInscriptionClient();
+        /*testerInscriptionClient();
         testerAuthentifierClient();
         testerListerTousCartomanciens();
         testerDemandeConsultation();
@@ -131,10 +131,7 @@ public class Main {
         testerDebuterConsultation();
         testerRealiserPrediction();
         testerTerminerConsultation();
-        Service s = new Service();
-        System.out.println(s.obtenirEmployeConnecte());
-        
-        /*testerLaisserCommentaire();
+        testerLaisserCommentaire();
         testerNbConsultationsParMedium();
         testerNbClientsParEmploye();
         testerTop5Medium();
@@ -142,6 +139,40 @@ public class Main {
         
         
         
+    }
+    
+    public static void debugHistorique() {
+        Service service = new Service();
+       
+        long id = 8;
+        Medium monMedium = service.trouverMediumParId(id);
+        List <Consultation> histmed = monMedium.getHistorique();
+        
+        id = 5;
+        Employe monEmploye = service.trouverEmployeParId(id);
+        List <Consultation> histemp = monEmploye.getHistorique();
+        
+        id = 12;
+        Client monClient = service.trouverClientParId(id);
+        List <Consultation> histcli = monClient.getHistorique();
+        
+        System.out.println(" Medium : ");
+        
+        for (Consultation consultation : histmed) {
+            System.out.println(consultation);
+        }
+        
+        System.out.println(" Employe : ");
+        
+        for (Consultation consultation : histemp) {
+            System.out.println(consultation);
+        }
+        
+        System.out.println(" Client : ");
+        
+        for (Consultation consultation : histcli) {
+            System.out.println(consultation);
+        }
     }
     
     public static void testerInitialiserEmployes() {
@@ -204,7 +235,7 @@ public class Main {
     public static void testerAuthentifierEmploye() {
         Service service = new Service();
         
-        if (service.seConnecter("l.fapo@gmail.com", "toto") == true) {
+        if (service.seConnecter("e.irisa@gmail.com", "toto") == true) {
             System.out.println("Réussite de la connexion employé");
             System.out.println("Trace : Bonjour " + service.obtenirEmployeConnecte().getPrenom());
         } else {
@@ -255,7 +286,7 @@ public class Main {
 
         Service service = new Service();
         
-        long id = 7;
+        long id = 8;
         Medium monMedium = service.trouverMediumParId(id);
         
         service.demanderConsultation(monMedium);
@@ -315,30 +346,20 @@ public class Main {
     
     public static void testerNbConsultationsParMedium() {
         Service service = new Service();
-        
-        long id = 7;
-        Medium monMedium = service.trouverMediumParId(id);
-        System.out.println(service.chercherNombreConsultationsParMedium(monMedium));
+        service.chercherNombreConsultationsParMedium();
           
     }
     
     public static void testerNbClientsParEmploye() {
     
         Service service = new Service();
-        
-        long id = 5;
-        Employe monEmploye = service.trouverEmployeParId(id);
-        System.out.println(service.chercherNombreClientsParEmploye(monEmploye));
+        service.chercherNombreClientsParEmploye();
           
     }
     
     public static void testerTop5Medium() {
         Service service = new Service();
-        List <Medium> tous = service.chercherTop5Medium();
-
-        for (Medium medium : tous) {
-            System.out.println(medium);
-        }
+        service.chercherTop5Medium();
     }
 
     public static void testerSeDeconnecter() {

@@ -51,7 +51,7 @@ public class EmployeDAO {
         if (monMedium == null) {
             System.out.println("Le medium est invalide");
         } else {
-            String s = "select e from Employe e where e.genre = :unGenre and e.disponible = 1 order by ( select count(c) from Consultation c where c.employe.id = e.id)";
+            String s = "select e from Employe e where e.genre = :unGenre and e.disponible = 1 order by ( select count(c) from Consultation c where c.employe.id = e.id), e.nom";
             TypedQuery query = JpaUtil.obtenirContextePersistance().createQuery(s,Employe.class);
             query.setParameter("unGenre", monMedium.getGenre());
             List<Employe> resultList = query.getResultList();

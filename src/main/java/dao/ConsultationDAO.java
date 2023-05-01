@@ -39,20 +39,28 @@ public class ConsultationDAO {
         return query.getResultList();
     }
     
-    public Consultation chercherParEmploye(Employe monEmploye) {
+    public List<Consultation> chercherParEmployeDemandee(Employe monEmploye) {
         String s = "select c from Consultation c where c.employe = :unEmploye and c.etat = :etat";
         TypedQuery <Consultation> query = JpaUtil.obtenirContextePersistance().createQuery(s,Consultation.class);
         query.setParameter("unEmploye", monEmploye);
         query.setParameter("etat", "Demandée");
-        return query.getResultList().get(0);
+        return query.getResultList();
     }
     
-    public Consultation chercherParEmployeTerminee(Employe monEmploye) {
-        String s = "select c from Consultation c where c.employe = :unEmploye and c.etat = :etat order by c.dateDebut desc and c.heureFin desc";
+    public List<Consultation> chercherParEmployePrete(Employe monEmploye) {
+        String s = "select c from Consultation c where c.employe = :unEmploye and c.etat = :etat";
+        TypedQuery <Consultation> query = JpaUtil.obtenirContextePersistance().createQuery(s,Consultation.class);
+        query.setParameter("unEmploye", monEmploye);
+        query.setParameter("etat", "Prête");
+        return query.getResultList();
+    }
+    
+    public List<Consultation> chercherParEmployeTerminee(Employe monEmploye) {
+        String s = "select c from Consultation c where c.employe = :unEmploye and c.etat = :etat order by c.dateDebut desc, c.heureFin desc";
         TypedQuery <Consultation> query = JpaUtil.obtenirContextePersistance().createQuery(s,Consultation.class);
         query.setParameter("unEmploye", monEmploye);
         query.setParameter("etat", "Terminée");
-        return query.getResultList().get(0);
+        return query.getResultList();
     }
     
      public List<Consultation> chercherParMedium(Medium medium) {

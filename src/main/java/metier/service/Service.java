@@ -320,41 +320,6 @@ public class Service {
         
     }
     
-    public void donnerProfilAstral() {
-        Client monClient = trouverClientParId(idClientConnecte);
-        
-        ClientDAO clidao = new ClientDAO();
-        AstroNetApi astroApi = new AstroNetApi();
-
-        try {
-            JpaUtil.creerContextePersistance();
-            JpaUtil.ouvrirTransaction();
-            
-            Client unClient = clidao.chercherParId(monClient.getId());
-            
-            List<String> profil = astroApi.getProfil(unClient.getPrenom(), unClient.getDateNaissance());
-            String signeZodiaque = profil.get(0);
-            String signeChinois = profil.get(1);
-            String couleur = profil.get(2);
-            String animal = profil.get(3);
-            
-            ProfilAstral unProfilAstral = new ProfilAstral(signeZodiaque, signeChinois, couleur, animal);
-            unClient.setMonProfilAstral(unProfilAstral);
-            
-            JpaUtil.validerTransaction();
-            System.out.println("Trace : Succès donnerProfilAstral ");
-            
-        }
-        catch(Exception ex) {
-            JpaUtil.annulerTransaction();
-            ex.printStackTrace();
-            System.out.println("Trace : Echec donnerProfilAstral ");
-        }finally {
-            JpaUtil.fermerContextePersistance();
-        }
-        
-    }
-    
     public Employe authentifierEmploye(String mail, String motDePasse) {  
        
         Employe monEmploye = null;
@@ -373,11 +338,7 @@ public class Service {
                idEmployeConnecte = monEmploye.getId();
 
                System.out.println("Trace : Succès authentifierEmploye");
-            }
-
-            if (monEmploye == null) {
-              System.out.println("Trace : Echec authentifierEmploye");
-            }
+            } else System.out.println("Trace : Echec authentifierEmploye");
 
             JpaUtil.fermerContextePersistance();
         } else System.out.println("Trace : Echec authentifierEmploye : un utilisateur est déjà connecté");
@@ -462,7 +423,7 @@ public class Service {
     }
     
     
-    public boolean demanderConsultation(Client monClient, Medium monMedium) {
+    /*public boolean demanderConsultation(Client monClient, Medium monMedium) {
 
         boolean reussite = true;
         
@@ -526,7 +487,7 @@ public class Service {
         
         return reussite;
         
-    }
+    }*/
     
     
     public boolean demanderConsultation(Medium monMedium) {
@@ -583,6 +544,7 @@ public class Service {
 
                 }
                 catch(Exception ex) {
+                    reussite = false;
                     JpaUtil.annulerTransaction();
                     ex.printStackTrace();
                     System.out.println("Trace : Echec demanderConsultation");
@@ -591,12 +553,46 @@ public class Service {
             }
 
             JpaUtil.fermerContextePersistance();
-        } else System.out.println("Trace : Echec demanderConsultation ; le client n'est pas connecté");
-        
+        } else {
+            System.out.println("Trace : Echec demanderConsultation ; le client n'est pas connecté");
+            reussite = false;
+        }
+
         return reussite;
         
     }
     
+    /*public ProfilAstral obtenirProfilAstralPourClient(Client monClient) {
+
+        ProfilAstral unProfilAstral = null;
+
+        if (idClientConnecte != 0) {
+
+            ClientDAO clidao = new ClientDAO();
+
+            JpaUtil.creerContextePersistance();
+
+            Client unClient = clidao.chercherParId(monClient.getId());
+
+            if (unClient != null) {
+                unProfilAstral = unClient.getMonProfilAstral();
+                if (unProfilAstral != null) {
+                    System.out.println("Trace : Succès obtenirProfilAstralPourClient");
+                } else {
+                    System.out.println("Trace : Echec obtenirProfilAstralPourClient");
+                }
+            } else {
+                System.out.println("Trace : Echec obtenirProfilAstralPourClient");
+            }
+
+
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec obtenirProfilAstralPourClient : le client n'est pas connecté");
+
+      return unProfilAstral;
+    }*/
+
     public ProfilAstral obtenirProfilAstralPourClient() {  
        
         ProfilAstral unProfilAstral = null;
@@ -628,6 +624,38 @@ public class Service {
       return unProfilAstral;
     }
     
+    /*public List<Consultation> obtenirHistoriquePourClient(Client monClient) {
+
+        List<Consultation> mesConsultations = null;
+
+        if (idClientConnecte != 0) {
+
+            ClientDAO clidao = new ClientDAO();
+
+            JpaUtil.creerContextePersistance();
+
+            Client unClient = clidao.chercherParId(monClient.getId());
+
+            if (unClient != null) {
+                mesConsultations = unClient.getHistorique();
+                if (mesConsultations != null) {
+                    System.out.println("Trace : Succès obtenirHistoriquePourClient");
+                } else {
+                    System.out.println("Trace : Echec obtenirHistoriquePourClient");
+                }
+            } else {
+                System.out.println("Trace : Echec obtenirHistoriquePourClient");
+            }
+
+
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec obtenirHistoriquePourClient : le client n'est pas connecté");
+
+        return mesConsultations;
+    }*/
+
+
     public List<Consultation> obtenirHistoriquePourClient() { 
        
         List<Consultation> mesConsultations = null;
@@ -659,6 +687,8 @@ public class Service {
         return mesConsultations;
     }
     
+
+
     public Consultation trouverConsultationParId(Long id) {        
         
         ConsultationDAO condao = new ConsultationDAO();
@@ -673,6 +703,38 @@ public class Service {
         return maConsultation;
     }
     
+    /*public ProfilAstral obtenirProfilAstralDuClient(Employe monEmploye) {
+
+        ProfilAstral unProfilAstral = null;
+
+        if (idEmployeConnecte != 0) {
+
+            ClientDAO clidao = new ClientDAO();
+            EmployeDAO empdao = new EmployeDAO();
+
+            JpaUtil.creerContextePersistance();
+            Employe unEmploye = empdao.chercherParId(monEmploye.getId());
+
+            if (unEmploye != null) {
+                List <Client> mesClients = clidao.chercherParEmploye(unEmploye);
+                if (!mesClients.isEmpty()) {
+                    Client monClient=mesClients.get(0);
+                    unProfilAstral = monClient.getMonProfilAstral();
+                    if (unProfilAstral != null) {
+                    System.out.println("Trace : Succès obtenirProfilAstralDuClient");
+                    } else {
+                    System.out.println("Trace : Echec obtenirProfilAstralDuClient - Pas de profil astral");
+                    }
+                } else System.out.println("Trace : Echec obtenirProfilAstralDuClient - Pas de client");
+            } else System.out.println("Trace : Echec obtenirProfilAstralDuClient - Pas d'employé");
+
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec obtenirProfilAstralDuClient : l'employé n'est pas connecté");
+
+        return unProfilAstral;
+    }*/
+
     public ProfilAstral obtenirProfilAstralDuClient() { 
        
         ProfilAstral unProfilAstral = null;
@@ -686,8 +748,9 @@ public class Service {
             Employe unEmploye = empdao.chercherParId(idEmployeConnecte);
 
             if (unEmploye != null) {
-                Client monClient = clidao.chercherParEmploye(unEmploye); //marche pas l'idée était de d'avoir le client de la table consultation ou idEmploye=idEmployeConnecte et etat=demandée
-                if (monClient != null) {
+                List <Client> mesClients = clidao.chercherParEmploye(unEmploye);
+                if (!mesClients.isEmpty()) {
+                    Client monClient=mesClients.get(0);
                     unProfilAstral = monClient.getMonProfilAstral(); 
                     if (unProfilAstral != null) {
                     System.out.println("Trace : Succès obtenirProfilAstralDuClient");
@@ -704,6 +767,36 @@ public class Service {
         return unProfilAstral;
     }
     
+    /*public List<Consultation> obtenirHistoriqueDuClient(Employe monEmploye) {
+
+        List<Consultation> mesConsultations = null;
+
+        if (idEmployeConnecte != 0) {
+
+            ClientDAO clidao = new ClientDAO();
+            EmployeDAO empdao = new EmployeDAO();
+
+            JpaUtil.creerContextePersistance();
+
+            Employe unEmploye = empdao.chercherParId(monEmploye.getId());
+
+            if (unEmploye != null) {
+                List <Client> mesClients = clidao.chercherParEmploye(unEmploye);
+                if (!mesClients.isEmpty()) {
+                    Client unClient=mesClients.get(0);
+                    mesConsultations = unClient.getHistorique();
+                    if (!mesConsultations.isEmpty()) {
+                        System.out.println("Trace : Succès obtenirHistoriqueDuClient");
+                    } else System.out.println("Trace : Succès obtenirHistoriqueDuClient - historique vide");
+                } else System.out.println("Trace : Echec obtenirHistoriqueDuClient - pas de client");
+            } else System.out.println("Trace : Echec obtenirHistoriqueDuClient - pas d'employé");
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec obtenirHistoriqueDuClient : l'employé n'est pas connecté");
+
+        return mesConsultations;
+    }*/
+
     public List<Consultation> obtenirHistoriqueDuClient() {   
         
         List<Consultation> mesConsultations = null;
@@ -718,8 +811,9 @@ public class Service {
             Employe unEmploye = empdao.chercherParId(idEmployeConnecte);
             
             if (unEmploye != null) {
-                Client unClient = clidao.chercherParEmploye(unEmploye); //marche pas l'idée était de d'avoir le client de la table consultation ou idEmploye=idEmployeConnecte et etat=demandée
-                if (unClient != null) {
+                List <Client> mesClients = clidao.chercherParEmploye(unEmploye);
+                if (!mesClients.isEmpty()) {
+                    Client unClient=mesClients.get(0);
                     mesConsultations = unClient.getHistorique();
                     if (!mesConsultations.isEmpty()) {
                         System.out.println("Trace : Succès obtenirHistoriqueDuClient");
@@ -733,6 +827,48 @@ public class Service {
         return mesConsultations;
     }
     
+    /*public void realiserPrediction(Employe monEmploye, int niveauAmour, int niveauSante, int niveauTravail) throws IOException {
+
+        if (idEmployeConnecte != 0) {
+
+            AstroNetApi astroApi = new AstroNetApi();
+
+            ClientDAO clidao = new ClientDAO();
+
+            EmployeDAO empdao = new EmployeDAO();
+
+            JpaUtil.creerContextePersistance();
+
+            ProfilAstral unProfilAstral;
+
+            Employe unEmploye = empdao.chercherParId(monEmploye.getId());
+
+            if (unEmploye != null) {
+                List <Client> mesClients = clidao.chercherParEmploye(unEmploye);
+                if (!mesClients.isEmpty()) {
+                    Client unClient=mesClients.get(0);
+                    unProfilAstral = unClient.getMonProfilAstral();
+                    if (unProfilAstral != null) {
+                        List<String> predictions = astroApi.getPredictions(unProfilAstral.getCouleurPorteBonheur(), unProfilAstral.getAnimalTotem(), niveauAmour, niveauSante, niveauTravail);
+                        String predictionAmour = predictions.get(0);
+                        String predictionSante = predictions.get(1);
+                        String predictionTravail = predictions.get(2);
+
+                        System.out.println("~<[ Prédictions ]>~");
+                        System.out.println("[ Amour ] " + predictionAmour);
+                        System.out.println("[ Santé ] " + predictionSante);
+                        System.out.println("[Travail] " + predictionTravail);
+                        System.out.println("Trace : Succès realiserPrediction");
+                    } else System.out.println("Trace : Echec realiserPrediction - pas de profil astral");
+                } else System.out.println("Trace : Echec realiserPrediction - pas de client");
+            } else System.out.println("Trace : Echec realiserPrediction - pas d'employé");
+
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec realiserPrediction : l'employé n'est pas connecté");
+
+    }*/
+
     public void realiserPrediction(int niveauAmour, int niveauSante, int niveauTravail) throws IOException {
         
         if (idEmployeConnecte != 0) {
@@ -750,8 +886,9 @@ public class Service {
             Employe unEmploye = empdao.chercherParId(idEmployeConnecte);
 
             if (unEmploye != null) {
-                Client unClient = clidao.chercherParEmploye(unEmploye); //marche pas l'idée était de d'avoir le client de la table consultation ou idEmploye=idEmployeConnecte et etat=demandée
-                if (unClient != null) {
+                List <Client> mesClients = clidao.chercherParEmploye(unEmploye);
+                if (!mesClients.isEmpty()) {
+                    Client unClient=mesClients.get(0);
                     unProfilAstral = unClient.getMonProfilAstral();
                     if (unProfilAstral != null) {
                         List<String> predictions = astroApi.getPredictions(unProfilAstral.getCouleurPorteBonheur(), unProfilAstral.getAnimalTotem(), niveauAmour, niveauSante, niveauTravail);
@@ -774,6 +911,50 @@ public class Service {
         
     }
     
+    /*public void debuterConsultation(Consultation maConsultation) {
+
+        if (idEmployeConnecte != 0) {
+
+            ConsultationDAO condao = new ConsultationDAO();
+            JpaUtil.creerContextePersistance();
+
+            Consultation uneConsultation = condao.chercherParId(maConsultation.getId());
+
+
+            if (uneConsultation != null) {
+                Client unClient = uneConsultation.getClient();
+                Medium unMedium = uneConsultation.getMedium();
+
+                try {
+                    JpaUtil.ouvrirTransaction();
+
+                    uneConsultation.setEtat("Prête");
+
+                    System.out.println("Pour " + unClient.getPrenom() + " " + unClient.getNom() + ", Tel :" + unClient.getNoTelephone());
+                    System.out.println("Message : Bonjour " + unClient.getPrenom() + ". J'ai bien reçu votre demande de consultation du " + uneConsultation.getDateDebut() + " à " + uneConsultation.getHeureDebut() + ".");
+                    System.out.println("Vous pouvez dès à présent me contacter au " + unEmploye.getTelephonePro() + ". A tout de suite ! Médiumiquement vôtre, " + unMedium.getDenomination());
+
+                    JpaUtil.validerTransaction();
+
+                }
+                catch(Exception ex) {
+                    JpaUtil.annulerTransaction();
+                    ex.printStackTrace();
+                    System.out.println("Trace : Echec debuterConsultation");
+                }
+
+            System.out.println("Trace : Succès debuterConsultation");
+
+            } else {
+                System.out.println("Trace : Echec debuterConsultation");
+            }
+
+
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec debuterConsultation : l'employé n'est pas connecté");
+    }*/
+
     public void debuterConsultation() {      
         
         if (idEmployeConnecte != 0) {
@@ -785,22 +966,88 @@ public class Service {
             
             Employe unEmploye = empdao.chercherParId(idEmployeConnecte);
 
-            Consultation uneConsultation = condao.chercherParEmploye(unEmploye);
-            Client unClient = uneConsultation.getClient();
-            Medium unMedium = uneConsultation.getMedium();
+            List <Consultation> mesConsultations = condao.chercherParEmployeDemandee(unEmploye);
 
-            System.out.println("Pour " + unEmploye.getPrenom() + " " + unEmploye.getNom() + ", Tel :" + unEmploye.getTelephonePro());
-            System.out.println("Message : Bonjour " + unEmploye.getPrenom() + ". Consultation requise pour " + unClient.getPrenom() + " " + unClient.getNom() + ". Medium à incarner : " + unMedium.getDenomination() +".");
+            if (!mesConsultations.isEmpty()) {
+                Consultation uneConsultation = condao.chercherParId(mesConsultations.get(0).getId());
+                Client unClient = uneConsultation.getClient();
+                Medium unMedium = uneConsultation.getMedium();
 
-            uneConsultation.setEtat("Prête");
+                try {
+                    JpaUtil.ouvrirTransaction();
 
-            System.out.println("Trace : Succès debuterConsultation");
+                    uneConsultation.setEtat("Prête");
+
+                    System.out.println("Pour " + unClient.getPrenom() + " " + unClient.getNom() + ", Tel :" + unClient.getNoTelephone());
+                    System.out.println("Message : Bonjour " + unClient.getPrenom() + ". J'ai bien reçu votre demande de consultation du " + uneConsultation.getDateDebut() + " à " + uneConsultation.getHeureDebut() + ".");
+                    System.out.println("Vous pouvez dès à présent me contacter au " + unEmploye.getTelephonePro() + ". A tout de suite ! Médiumiquement vôtre, " + unMedium.getDenomination());
+
+                    JpaUtil.validerTransaction();
+
+                }
+                catch(Exception ex) {
+                    JpaUtil.annulerTransaction();
+                    ex.printStackTrace();
+                    System.out.println("Trace : Echec debuterConsultation");
+                }
+
+                System.out.println("Trace : Succès debuterConsultation");
+
+            } else {
+                System.out.println("Trace : Echec debuterConsultation");
+            }
+
 
             JpaUtil.fermerContextePersistance();
         
         } else System.out.println("Trace : Echec debuterConsultation : l'employé n'est pas connecté");
     }
     
+    /*public void terminerConsultation(Consultation maConsultation, Employe monEmploye) {
+
+        if (idEmployeConnecte != 0) {
+
+            ConsultationDAO condao = new ConsultationDAO();
+            EmployeDAO empdao = new EmployeDAO();
+
+            JpaUtil.creerContextePersistance();
+
+
+            Consultation uneConsultation = condao.chercherParId(maConsultation.getId());
+            Employe unEmploye = empdao.chercherParId(monEmploye.getId());
+
+            if (uneConsultation != null) {
+                try {
+                    JpaUtil.ouvrirTransaction();
+
+                    LocalTime heureFin = LocalTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                    String heureString = heureFin.format(formatter);
+
+                    uneConsultation.setEtat("Terminée");
+                    uneConsultation.setHeureFin(heureString);
+                    unEmploye.setDisponible(true);
+
+
+                    JpaUtil.validerTransaction();
+                    System.out.println("Trace : Succès terminerConsultation");
+
+
+                }
+                catch(Exception ex) {
+                    JpaUtil.annulerTransaction();
+                    ex.printStackTrace();
+                    System.out.println("Trace : Echec terminerConsultation");
+                }
+            } else {
+                System.out.println("Trace : Echec terminerConsultation");
+            }
+
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec terminerConsultation : l'employé n'est pas connecté");
+    }*/
+
      public void terminerConsultation() {      
         
         if (idEmployeConnecte != 0) {     
@@ -812,17 +1059,83 @@ public class Service {
 
             Employe unEmploye = empdao.chercherParId(idEmployeConnecte);
 
-            Consultation uneConsultation = condao.chercherParEmploye(unEmploye);
+            List <Consultation> mesConsultations = condao.chercherParEmployePrete(unEmploye);
             
-            uneConsultation.setEtat("Terminée");
-            unEmploye.setDisponible(true);
+            if (!mesConsultations.isEmpty()) {
+                Consultation uneConsultation = condao.chercherParId(mesConsultations.get(0).getId());
+                try {
+                    JpaUtil.ouvrirTransaction();
 
-            System.out.println("Trace : Succès terminerConsultation");
+                    LocalTime heureFin = LocalTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                    String heureString = heureFin.format(formatter);
+
+                    uneConsultation.setEtat("Terminée");
+                    uneConsultation.setHeureFin(heureString);
+                    unEmploye.setDisponible(true);
+
+
+                    JpaUtil.validerTransaction();
+                    System.out.println("Trace : Succès terminerConsultation");
+
+
+                }
+                catch(Exception ex) {
+                    JpaUtil.annulerTransaction();
+                    ex.printStackTrace();
+                    System.out.println("Trace : Echec terminerConsultation");
+                }
+            } else {
+                System.out.println("Trace : Echec terminerConsultation");
+            }
 
             JpaUtil.fermerContextePersistance();
             
         } else System.out.println("Trace : Echec terminerConsultation : l'employé n'est pas connecté");
     }
+
+
+     /*public void ajouterCommentaire(Employe monEmploye, String commentaire) {
+
+        if (idEmployeConnecte != 0) {
+
+            ConsultationDAO condao = new ConsultationDAO();
+
+            EmployeDAO empdao = new EmployeDAO();
+
+            JpaUtil.creerContextePersistance();
+
+
+            Employe unEmploye = empdao.chercherParId(monEmploye.getId());
+
+            List <Consultation> mesConsultations = condao.chercherParEmployeTerminee(unEmploye);
+
+            if (!mesConsultations.isEmpty()) {
+                Consultation uneConsultation = condao.chercherParId(mesConsultations.get(0).getId());
+                try {
+                    JpaUtil.ouvrirTransaction();
+
+
+                    uneConsultation.setCommentaire(commentaire);
+
+                    JpaUtil.validerTransaction();
+                    System.out.println("Trace : Succès ajouterCommentaire");
+
+                }
+                catch(Exception ex) {
+                    JpaUtil.annulerTransaction();
+                    ex.printStackTrace();
+                    System.out.println("Trace : Echec terminerConsultation");
+                }
+
+
+            } else System.out.println("Trace : Echec ajouterCommentaire");
+
+
+            JpaUtil.fermerContextePersistance();
+
+        } else System.out.println("Trace : Echec ajouterCommentaire : l'employé n'est pas connecté");
+    }*/
     
     
     public void ajouterCommentaire(String commentaire) {     
@@ -833,43 +1146,92 @@ public class Service {
 
             EmployeDAO empdao = new EmployeDAO();
 
+            JpaUtil.creerContextePersistance();
+
+
             Employe unEmploye = empdao.chercherParId(idEmployeConnecte);
 
-            JpaUtil.creerContextePersistance();
-            Consultation uneConsultation = condao.chercherParEmployeTerminee(unEmploye);
-            if (uneConsultation != null) {
-                uneConsultation.setCommentaire(commentaire);
-                System.out.println("Trace : Succès ajouterCommentaire");
+            List <Consultation> mesConsultations = condao.chercherParEmployeTerminee(unEmploye);
+
+            if (!mesConsultations.isEmpty()) {
+                Consultation uneConsultation = condao.chercherParId(mesConsultations.get(0).getId());
+                try {
+                    JpaUtil.ouvrirTransaction();
+
+
+                    uneConsultation.setCommentaire(commentaire);
+
+                    JpaUtil.validerTransaction();
+                    System.out.println("Trace : Succès ajouterCommentaire");
+
+                }
+                catch(Exception ex) {
+                    JpaUtil.annulerTransaction();
+                    ex.printStackTrace();
+                    System.out.println("Trace : Echec terminerConsultation");
+                }
+
+
             } else System.out.println("Trace : Echec ajouterCommentaire");
 
 
             JpaUtil.fermerContextePersistance();
             
-        } else System.out.println("Trace : Succès ajouterCommentaire : l'employé n'est pas connecté");
+        } else System.out.println("Trace : Echec ajouterCommentaire : l'employé n'est pas connecté");
     }
     
-    
-    public long chercherNombreConsultationsParMedium(Medium monMedium) {
+    /*public long chercherNombreConsultationsParMedium(Medium monMedium) {
         
-       ConsultationDAO condao = new ConsultationDAO();
-       
-       MediumDAO meddao = new MediumDAO();
-       
-       JpaUtil.creerContextePersistance();
-       
-       Medium unMedium = meddao.chercherParId(monMedium.getId());
-       
-       long resultat=condao.chercherNbConsultationsParMedium(unMedium);
-            
-       System.out.println("Trace : Succès getNombreConsultationParMedium");
-     
-       JpaUtil.fermerContextePersistance();
+        long resultat = 0;
+
+        if (idEmployeConnecte != 0) {
+
+           ConsultationDAO condao = new ConsultationDAO();
+
+           MediumDAO meddao = new MediumDAO();
+
+           JpaUtil.creerContextePersistance();
+
+           Medium unMedium = meddao.chercherParId(monMedium.getId());
+
+           resultat = condao.chercherNbConsultationsParMedium(unMedium);
+
+           System.out.println("Trace : Succès chercherNombreConsultationsParMedium");
+
+           JpaUtil.fermerContextePersistance();
+       } else {
+           System.out.println("Trace : Succès chercherNombreConsultationsParMedium");
+       }
        
        return resultat;
        
+    }*/
+
+    public void chercherNombreConsultationsParMedium() {
+
+       if (idEmployeConnecte != 0) {
+
+        ConsultationDAO condao = new ConsultationDAO();
+
+        MediumDAO meddao = new MediumDAO();
+
+        JpaUtil.creerContextePersistance();
+
+        List<Medium> maListe = meddao.chercherTous();
+
+        for (Medium medium : maListe) {
+             System.out.println("Nom du Medium : " + medium.getDenomination() + " ; Nombre de Consultations : " + condao.chercherNbConsultationsParMedium(medium));
+        }
+
+        System.out.println("Trace : Succès chercherNombreConsultationsParMedium");
+        JpaUtil.fermerContextePersistance();
+
+
+       } else System.out.println("Trace : Echec chercherNombreConsultationsParMedium : l'employé n'est pas connecté");
+
     }
     
-    public long chercherNombreClientsParEmploye(Employe monEmploye) {
+    /*public long chercherNombreClientsParEmploye(Employe monEmploye) {
         
         long resultat = 0;
         
@@ -885,17 +1247,65 @@ public class Service {
 
             resultat=condao.chercherNbClientsParEmploye(unEmploye);
 
-            System.out.println("Trace : Succès getNombreConsultationParMedium");
+            System.out.println("Trace : Succès chercherNombreClientsParEmploye");
 
             JpaUtil.fermerContextePersistance();
             
-        } else System.out.println("Trace : Echec getNombreConsultationParMedium : pas d'employé connecté");
+        } else System.out.println("Trace : Echec chercherNombreClientsParEmploye : pas d'employé connecté");
 
         return resultat;
        
+    }*/
+
+    public void chercherNombreClientsParEmploye() {
+
+        if (idEmployeConnecte != 0) {
+
+            ConsultationDAO condao = new ConsultationDAO();
+
+            EmployeDAO empdao = new EmployeDAO();
+
+            JpaUtil.creerContextePersistance();
+
+            List<Employe> maListe = empdao.chercherTous();
+
+            for (Employe employe : maListe) {
+                 System.out.println("Nom de l'employé : " + employe.getNom() + " " + employe.getPrenom() +" ; Nombre de Clients : " + condao.chercherNbClientsParEmploye(employe));
+            }
+
+            System.out.println("Trace : Succès chercherNombreConsultationsParMedium");
+            JpaUtil.fermerContextePersistance();
+
+
+       } else System.out.println("Trace : Echec chercherNombreConsultationsParMedium : l'employé n'est pas connecté");
+
     }
     
-    public List<Medium> chercherTop5Medium() {
+    /*public List<Medium> chercherTop5Medium2() {
+
+        List<Medium> resultat = null;
+
+       if (idEmployeConnecte != 0) {
+
+       ConsultationDAO condao = new ConsultationDAO();
+
+       JpaUtil.creerContextePersistance();
+
+       resultat = condao.chercherTopMedium();
+
+       System.out.println("Trace : Succès chercherTop5Medium");
+
+       JpaUtil.fermerContextePersistance();
+
+       } else System.out.println("Trace : Echec chercherTop5Medium : l'employé n'est pas connecté");
+
+       return resultat;
+
+    }*/
+
+    public void chercherTop5Medium() {
+
+       if (idEmployeConnecte != 0) {
         
        ConsultationDAO condao = new ConsultationDAO();
       
@@ -903,12 +1313,18 @@ public class Service {
        
        
        List<Medium> resultat=condao.chercherTopMedium();
+
+       System.out.println("Top 5 des médiums :");
+
+        for (Medium medium : resultat) {
+            System.out.println(medium);
+        }
             
-       System.out.println("Trace : Succès getNombreConsultationParMedium");
+       System.out.println("Trace : Succès chercherTop5Medium");
      
        JpaUtil.fermerContextePersistance();
-       
-       return resultat;
+
+       } else System.out.println("Trace : Echec chercherTop5Medium : l'employé n'est pas connecté");
        
     }
     
